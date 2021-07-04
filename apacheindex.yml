@@ -1,0 +1,21 @@
+version: "3.3"
+services:
+  indexapp:
+    container_name: indexapp
+    image: httpd:latest
+    volumes:
+      - "./indexapp/public/:/usr/local/apache2/htdocs/"
+    ports:
+      - 80
+    networks:
+      index_network:
+        ipv4_address: 172.29.0.3
+    env_file: .env
+    environment:
+      - VIRTUAL_HOST=${FPAGE_DN}
+      - LETSENCRYPT_HOST=${FPAGE_DN}
+      - LETSENCRYPT_EMAIL=${LE_MAIL}
+
+networks:
+  index_network:
+    external : true

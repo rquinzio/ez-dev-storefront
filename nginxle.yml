@@ -1,0 +1,53 @@
+version: "3.3"
+services:
+    proxy:
+        image: jwilder/nginx-proxy:alpine
+        labels:
+          - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+        container_name: nginx-proxy
+        networks:
+          index_network:
+            ipv4_address: 172.29.0.2
+          blog_network:
+            ipv4_address: 172.30.0.2
+          wiki_network:
+            ipv4_address: 172.32.0.2
+          le_network:
+            ipv4_address: 172.33.0.2
+        ports:
+          - 80:80
+          - 443:443
+        volumes:
+          - ./proxy/conf.d:/etc/nginx/conf.d:rw
+          - ./proxy/vhost.d:/etc/nginx/vhost.d:rw
+          - ./proxy/html:/usr/share/nginx/html:rw
+          - ./proxy/certs:/etc/nginx/certs:ro
+          - /etc/localtime:/etc/localtime:ro
+          - /var/run/docker.sock:/tmp/docker.sock:ro
+        restart: unless-stopped
+    
+    letsencrypt:
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        container_name: letsencrypt
+        depends_on:
+            - proxy
+        networks:
+            le_network:
+              ipv4_address: 172.33.0.3
+        volumes:
+            - ./proxy/certs:/etc/nginx/certs:rw
+            - ./proxy/vhost.d:/etc/nginx/vhost.d:rw
+            - ./proxy/html:/usr/share/nginx/html:rw
+            - /etc/localtime:/etc/localtime:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+        restart: unless-stopped
+
+networks:
+    index_network:
+        external: true
+    blog_network:
+        external: true
+    wiki_network:
+        external: true
+    le_network:
+        external: true

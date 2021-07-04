@@ -1,0 +1,50 @@
+version: "3.3"
+services:
+  wikidb:
+    image: mariadb
+    container_name: wiki-mariadb
+    networks:
+      wiki_network:
+        ipv4_address: 172.32.0.4
+    volumes:
+      - wikidb:/var/ib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    env_file: .env
+    environment: 
+      - MYSQL_ROOT_PASSWORD=${WIKI_ROOT_PASSWD}
+      - MYSQL_USER=${WIKI_DBUSER_NAME}
+      - MYSQL_PASSWORD=${WIKI_DBUSER_PASSWD}
+      - MYSQL_DATABASE=${WIKI_DB_NAME}
+    restart: unless-stopped
+
+  wiki-app:
+    image: requarks/wiki:2
+    container_name: wiki-app
+    networks:
+        wiki_network:
+          ipv4_address: 172.32.0.3
+    volumes:
+      - wikidata:/wiki
+    depends_on:
+      - wikidb
+    env_file: .env
+    environment:
+      DB_TYPE: mariadb
+      DB_HOST: wikidb
+      DB_PORT: 3306
+      DB_USER: ${WIKI_DBUSER_NAME}
+      DB_PASS: ${WIKI_DBUSER_PASSWD}
+      DB_NAME: ${WIKI_DB_NAME}
+      VIRTUAL_HOST: ${WIKI_DN}
+      LETSENCRYPT_HOST: ${WIKI_DN}
+      LETSENCRYPT_EMAIL: ${LE_MAIL}
+      config.yml: wiki-config.yml
+    restart: unless-stopped
+
+volumes:
+  wikidb:
+  wikidata:
+
+networks:
+    wiki_network:
+      external: true

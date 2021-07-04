@@ -1,0 +1,50 @@
+version: '3.3'
+services:
+  blogdb:
+    image: mariadb
+    container_name: blog-mariadb
+    networks:
+      blog_network:
+        ipv4_address: 172.30.0.4
+    volumes:
+      - blogdb:/var/lib/mysql
+      - /etc/localtime:/etc/localtime:ro
+    env_file: .env
+    environment: 
+      - MYSQL_ROOT_PASSWORD=${BLOG_ROOT_PASSWD}
+      - MYSQL_USER=${BLOG_DBUSER_NAME}
+      - MYSQL_PASSWORD=${BLOG_DBUSER_PASSWD}
+      - MYSQL_DATABASE=${BLOG_DB_NAME}
+      - MYSQL_TCP_PORT=3306
+    restart: unless-stopped
+
+  blogapp:
+    image: wordpress:latest
+    container_name: blog-app
+    networks:
+      blog_network:
+        ipv4_address: 172.30.0.3
+    depends_on:
+      - blogdb
+    ports:
+      - 80
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - VIRTUAL_HOST=${BLOG_DN}
+      - VIRTUAL_PORT=80
+      - WORDPRESS_DB_HOST=blogdb:3306
+      - WORDPRESS_DB_USER=${BLOG_DBUSER_NAME}
+      - WORDPRESS_DB_PASSWORD=${BLOG_DBUSER_PASSWD}
+      - WORDPRESS_DB_NAME=${BLOG_DB_NAME}
+      - LETSENCRYPT_HOST=${BLOG_DN}
+      - LETSENCRYPT_EMAIL=${LE_MAIL}
+    volumes:
+      - ./blogapp:/var/www
+
+volumes:
+  blogdb:
+
+networks:
+  blog_network:
+        external: true
