@@ -4,12 +4,13 @@ A set of docker-compose files to deploy a web storefront for your developper ski
 
 THE HTTPD WEB ROOT IS EMPTY, IMPORT YOUR SITE IN ./indexapp/public
 
-For more detailed instructions, you can visit https://sysadmin.rquinzio.fr/en/ez-dev-storefront
+For more detailed instructions, you can visit https://sysadmin.rquinzio.fr/en/git-docs/ez-dev-storefront
 
 Ressources used:
-- jwilder/nginx-proxy:alpine
-- jrcs/letsencrypt-nginx-proxy-companion
-- httpd:latest
-- mariadb
-- wordpress:latest
-- requarks/wiki:2
+
+    jwilder/nginx-proxy:alpine
+    jrcs/letsencrypt-nginx-proxy-companion
+    httpd:latest
+    mariadb
+    wordpress:latest
+    requarks/wiki:2
