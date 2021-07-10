@@ -40,7 +40,8 @@ services:
       - LETSENCRYPT_HOST=${BLOG_DN}
       - LETSENCRYPT_EMAIL=${LE_MAIL}
     volumes:
-      - ./blogapp:/var/www
+      - ./blogapp:/var/www/html
+      - ./blogapp/wp-content/themes:/var/www/html/wp-content/themes
 
 volumes:
   blogdb:
